@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => {
         },
         includeAssets: [
           'assets/icons/favicon.ico',
+          'assets/icons/icon-apple.png',
           'assets/icons/icon-192.png',
           'assets/icons/icon-512.png',
         ],
