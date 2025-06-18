@@ -39,4 +39,3 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ timeInSeconds, className })
 };
 
 export default TimerDisplay;
-    

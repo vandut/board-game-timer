@@ -6,6 +6,7 @@ import Button from './Button';
 // import InputNumber from './InputNumber'; 
 import TimerDisplay from './TimerDisplay';
 import AppHeader from './AppHeader'; 
+import { playSound } from '../audioUtils'; // Adjusted path for root audioUtils.ts
 
 // Helper function to parse and validate HH:MM time string
 const parseTimeInput = (timeValue: string): { majorUnit: number; minorUnit: number; isValid: boolean; error?: string; formatted?: string } => {
@@ -237,6 +238,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
             carryOverUnusedTime: actualNumRounds > 1 ? carryOverTime : false, 
             payOverdueWithUnusedRoundTime: actualNumRounds > 1 ? payOverdueTime : false,
         };
+        playSound('/board-game-timer/sounds/navigate_forward.mp3');
         onSaveSettings(timeSettingsToSave);
       } else {
         setSessionTimeError(finalParsedTime.error || "Double check session time.");

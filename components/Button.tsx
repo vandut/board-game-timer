@@ -33,4 +33,3 @@ const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', classNam
 };
 
 export default Button;
-    

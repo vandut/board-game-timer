@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
           'icons/icon-apple.png',
           'icons/icon-192.png',
           'icons/icon-512.png',
+          'sounds/navigate_forward.mp3',
         ],
         manifest: {
           name: 'Board Game Timer',
