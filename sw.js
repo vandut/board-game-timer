@@ -1,18 +1,18 @@
 // sw.js
-const CACHE_NAME = 'board-game-timer-cache-v4'; // Incremented version
+const CACHE_NAME = 'board-game-timer-cache-v5'; // Incremented version
 const TAILWIND_URL = 'https://cdn.tailwindcss.com';
 
 // Files that make up the app shell and are critical for offline functionality
 const APP_SHELL_FILES = [
-  '/',
-  '/index.html',
-  '/index.tsx', // Main application script
-  '/manifest.json', // Web app manifest
+  '/board-game-timer/',
+  '/board-game-timer/index.html',
+  '/board-game-timer/index.tsx', // Main application script
+  '/board-game-timer/manifest.json', // Web app manifest
   // Local icons (ensure these files exist in your project)
-  '/assets/icons/icon-192.png',
-  '/assets/icons/maskable-icon-192.png',
-  '/assets/icons/icon-512.png',
-  '/assets/icons/maskable-icon-512.png',
+  '/board-game-timer/assets/icons/icon-192.png',
+  '/board-game-timer/assets/icons/maskable-icon-192.png',
+  '/board-game-timer/assets/icons/icon-512.png',
+  '/board-game-timer/assets/icons/maskable-icon-512.png',
   // You might want to add other essential assets here if any
 ];
 
@@ -95,7 +95,9 @@ self.addEventListener('fetch', (event) => {
           // Network failed, try to serve from cache
           return caches.match(request).then((cachedResponse) => {
             // If request not in cache, fallback to the root index.html for SPA behavior
-            return cachedResponse || caches.match('/index.html');
+            return (
+              cachedResponse || caches.match('/board-game-timer/index.html')
+            );
           });
         })
     );
