@@ -1,6 +1,7 @@
+
 {
   "name": "Board Game Timer",
-  "description": "A Progressive Web App to manage individual player timers for board games and track overall session time. Supports multiple players and configurable session duration.",
+  "description": "An application to manage individual player timers for board games and track overall session time. Supports multiple players and configurable session duration.",
   "requestFramePermissions": [],
   "prompt": ""
 }

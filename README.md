@@ -1,8 +1,8 @@
-# Board Game Timer PWA
+# Board Game Timer
 
 ## Project Purpose
 
-The "Board Game Timer" is a Progressive Web App (PWA) designed to manage and track time for multiple players during board game sessions. It provides a flexible and user-friendly experience for various game setups, supporting individual player timers, configurable session durations, multiple rounds, and options for handling overdue and unused time. The application is built to be responsive, work offline, and adhere to accessibility best practices.
+The "Board Game Timer" is a web application designed to manage and track time for multiple players during board game sessions. It provides a flexible and user-friendly experience for various game setups, supporting individual player timers, configurable session durations, multiple rounds, and options for handling overdue and unused time. The application is built to be responsive and adhere to accessibility best practices.
 
 For a detailed breakdown of all features, user flows, and technical specifications, please refer to the [REQUIREMENTS.md](REQUIREMENTS.md) file.
 

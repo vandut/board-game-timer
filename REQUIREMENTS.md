@@ -3,7 +3,7 @@
 
 ## 1. Introduction / App Purpose
 
-The "Board Game Timer" is a Progressive Web App (PWA) designed to manage and track time for multiple players during board game sessions. It aims to provide a flexible and user-friendly experience for various game setups.
+The "Board Game Timer" is a web application designed to manage and track time for multiple players during board game sessions. It aims to provide a flexible and user-friendly experience for various game setups.
 
 Key objectives include:
 - Supporting multiple players with individual timers.
@@ -12,7 +12,6 @@ Key objectives include:
 - Managing "overdue time" when players exceed their allocated time.
 - Offering optional features like carrying over unused round time and using unused time to pay off overdue balances.
 - Ensuring responsive design for various screen sizes.
-- Providing offline functionality through PWA capabilities.
 - Adhering to accessibility best practices.
 
 ## 2. Core Concepts
@@ -201,7 +200,7 @@ A consistent **App Header** displaying "Board Game Timer" is present on the Play
 
 ## 4. General Requirements
 
-*   **Offline Functionality:** The application must be a Progressive Web App (PWA) capable of functioning offline after the initial load. This includes caching of app shell, assets, and potentially game state (though current implementation seems to reset on full reload, standard PWA caching applies for app files).
+*   **Browser Caching:** The application should leverage standard browser caching mechanisms for assets.
 *   **Responsiveness:** The UI must adapt to different screen sizes, providing a good user experience on both mobile devices and desktops. Layouts should adjust (e.g., grid columns for player boxes).
 *   **Accessibility:** The application should follow accessibility best practices, including:
     *   Sufficient color contrast.
@@ -213,7 +212,7 @@ A consistent **App Header** displaying "Board Game Timer" is present on the Play
     *   Clear error messaging and input validation.
     *   Intuitive navigation and interaction patterns.
     *   Visual feedback for active states and timer status.
-*   **State Persistence (Implied for PWA):** While full game state persistence across browser sessions is not explicitly detailed as a current feature for an *interrupted* game, the PWA nature implies assets are cached for faster subsequent loads and offline use. A running game's state is held in React components and would be lost on a hard refresh or browser close unless explicitly saved to local storage (which is not a current explicit requirement found).
+*   **State Management:** A running game's state is held in React components and would be lost on a hard refresh or browser close unless explicitly saved to local storage (which is not a current explicit requirement found).
 
 This document outlines the core business requirements based on the provided application code.
 Ensure all UI elements have clear labels and instructions.
@@ -226,13 +225,10 @@ Consider adding a "Settings" or "Help" section in the future for more complex fe
 Focus on a clean, modern aesthetic that is visually appealing and enhances usability.
 The app relies on client-side logic for all its operations, including timer management and state updates. There is no backend server component described for game logic.
 The app uses Tailwind CSS for styling, implying a utility-first approach to design.
-The service worker (`sw.js`) is configured for caching app shell resources and uses a cache-first strategy for static assets and network-falling-back-to-cache for navigation.
 React is the core framework for building the UI components and managing state.
 Typescript is used for type safety.
 ESM modules are used for JavaScript, with dependencies loaded from `esm.sh`.
 The app uses standard HTML, CSS, and JavaScript, runnable in a web browser.
-It includes a web app manifest (`manifest.json`) for PWA installation and metadata.
-Icons are provided for PWA home screen installation.
 The `index.html` file sets up the basic page structure, loads Tailwind CSS, and initializes the React application.
-The `metadata.json` seems to be for a specific platform or tool that uses it to understand the app's capabilities and permissions, separate from the standard web manifest. Currently, it requests no special frame permissions.
+The `metadata.json` seems to be for a specific platform or tool that uses it to understand the app's capabilities and permissions. Currently, it requests no special frame permissions.
 The application assumes the `API_KEY` environment variable is pre-configured if any Gemini API features were to be added; however, no such features are currently implemented. The provided code does not use `@google/genai`.
