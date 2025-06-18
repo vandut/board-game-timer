@@ -12,10 +12,10 @@ export default defineConfig(({ mode }) => {
           enabled: true,
         },
         includeAssets: [
-          'assets/icons/favicon.ico',
-          'assets/icons/icon-apple.png',
-          'assets/icons/icon-192.png',
-          'assets/icons/icon-512.png',
+          'icons/favicon.ico',
+          'icons/icon-apple.png',
+          'icons/icon-192.png',
+          'icons/icon-512.png',
         ],
         manifest: {
           name: 'Board Game Timer',
@@ -26,12 +26,12 @@ export default defineConfig(({ mode }) => {
           background_color: '#f1f5f9',
           icons: [
             {
-              src: 'assets/icons/icon-192.png',
+              src: 'icons/icon-192.png',
               sizes: '192x192',
               type: 'image/png',
             },
             {
-              src: 'assets/icons/icon-512.png',
+              src: 'icons/icon-512.png',
               sizes: '512x512',
               type: 'image/png',
             },
