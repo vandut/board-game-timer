@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import Button from '../../components/Button';
-import AppHeader from '../../components/AppHeader'; 
-import AppFooter from '../../components/AppFooter'; // Import the new footer
 import { playNavigateForwardSound } from '../../audioUtils';
 import PlayerCountInput from './PlayerCountInput';
+import SetupScreenLayout from '../../components/SetupScreenLayout';
+import SetupScreenHeader from '../../components/SetupScreenHeader'; // Import the new header
 
 interface PlayerCountScreenProps {
   onProceedToTimeConfig: (numPlayers: number) => void;
@@ -27,39 +27,32 @@ const PlayerCountScreen: React.FC<PlayerCountScreenProps> = ({ onProceedToTimeCo
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-sky-100">
-      <AppHeader />
-      <main className="flex-grow flex flex-col items-center justify-start pt-6 sm:pt-10 pb-8 px-4 w-full">
-        <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg space-y-6"> {/* Changed max-w-md to max-w-lg */}
-          <h1 className="text-3xl font-bold text-center text-sky-700 mb-6">Player Count Setup</h1>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <PlayerCountInput
-              id="numPlayers"
-              label="Number of Players (1-16)"
-              initialValue={validatedNumPlayers}
-              onValueChange={handlePlayerCountChange}
-              min={1}
-              max={16}
-              maxLength={2}
-            />
-            
-            <div className="space-y-3 pt-2">
-               <Button 
-                  type="submit" 
-                  variant="primary" 
-                  className="w-full py-3 text-lg"
-                  disabled={!!playerInputError}
-                >
-                  Next: Configure Time
-              </Button>
-            </div>
-
-          </form>
+    <SetupScreenLayout>
+      <SetupScreenHeader mainText="Player Count Setup" />
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <PlayerCountInput
+          id="numPlayers"
+          label="Number of Players (1-16)"
+          initialValue={validatedNumPlayers}
+          onValueChange={handlePlayerCountChange}
+          min={1}
+          max={16}
+          maxLength={2}
+        />
+        
+        <div className="space-y-3 pt-2">
+            <Button 
+              type="submit" 
+              variant="primary" 
+              className="w-full py-3 text-lg"
+              disabled={!!playerInputError}
+            >
+              Next: Configure Time
+          </Button>
         </div>
-      </main>
-      <AppFooter />
-    </div>
+      </form>
+    </SetupScreenLayout>
   );
 };
 

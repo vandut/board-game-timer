@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Player, GameSettings } from '../../types';
 import Button from '../../components/Button';
-import AppHeader from '../../components/AppHeader';
-import AppFooter from '../../components/AppFooter'; // Import the new footer
 import { playNavigateForwardSound } from '../../audioUtils';
 import PlayerNameInput from './PlayerNameInput';
-import GameSettingsDisplay from './GameSettingsDisplay';
+import SetupScreenLayout from '../../components/SetupScreenLayout';
+import SetupScreenHeader from '../../components/SetupScreenHeader'; // Import the new header
 
 interface PlayerNameScreenProps {
   initialPlayers: Player[];
@@ -13,6 +12,42 @@ interface PlayerNameScreenProps {
   onConfirm: (updatedPlayers: Player[]) => void;
   onBack: () => void; 
 }
+
+// Helper function to format main game settings display string
+const formatGameSettingsSummary = (settings: GameSettings): string => {
+  const { 
+    totalSessionTimeHours: hours, 
+    totalSessionTimeMinutes: minutes, 
+    numberOfRounds, 
+    carryOverUnusedTime,
+    payOverdueWithUnusedRoundTime 
+  } = settings;
+  const hrText = `${hours} hour${hours !== 1 ? 's' : ''}`;
+  const minText = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  let durationStr = "0 minutes";
+
+  if (hours > 0 && minutes > 0) {
+    durationStr = `${hrText} ${minText}`;
+  } else if (hours > 0) {
+    durationStr = hrText;
+  } else if (minutes > 0) {
+    durationStr = minText;
+  }
+  
+  const roundsStr = `${numberOfRounds} round${numberOfRounds !== 1 ? 's' : ''}`;
+  
+  let featuresStr = "";
+  if (numberOfRounds > 1) {
+    const carryOverStr = carryOverUnusedTime ? "Unused round time carries over." : "Unused round time is lost.";
+    const payOverdueStr = payOverdueWithUnusedRoundTime ? "Can pay overdue with unused round time." : "Cannot pay overdue with unused round time.";
+    featuresStr = `${carryOverStr} ${payOverdueStr}`;
+  } else {
+    featuresStr = "Single round game.";
+  }
+  
+  return `Total Session: ${durationStr} over ${roundsStr}.\n${featuresStr}`;
+};
+
 
 const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
   initialPlayers,
@@ -46,11 +81,9 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
     e.preventDefault();
     const isAnyInvalid = Object.values(playerNameErrors).some(err => err);
     if (isAnyInvalid) {
-        // This alert is a fallback, button should be disabled
         alert('All players must have a name.');
         return;
     }
-    // Double check directly from editablePlayers as final source of truth for names
     if (editablePlayers.some(p => p.name.trim() === '')) {
         alert('All players must have a name. Please ensure all names are filled.');
         return;
@@ -60,67 +93,53 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
   };
 
   const isAnyNameInvalid = useMemo(() => {
-    // Ensure all players have an error status initialized.
-    // If not (e.g., during initial setup), consider it invalid to be safe.
     if (gameSettings.numberOfPlayers > 0 && Object.keys(playerNameErrors).length !== gameSettings.numberOfPlayers) {
       return true;
     }
     return Object.values(playerNameErrors).some(hasError => hasError);
   }, [playerNameErrors, gameSettings.numberOfPlayers]);
 
-
-  if (!editablePlayers.length && gameSettings.numberOfPlayers > 0) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-sky-100">
-        <AppHeader />
-        <main className="flex-grow flex items-center justify-center p-4">
-          Loading player setup...
-        </main>
-        <AppFooter />
-      </div>
-    );
-  }
+  const subHeaderText = useMemo(() => {
+    if (!gameSettings) return undefined;
+    const settingsSummary = formatGameSettingsSummary(gameSettings);
+    const playersSummary = `${gameSettings.numberOfPlayers} player${gameSettings.numberOfPlayers !== 1 ? 's' : ''}.`;
+    return `${settingsSummary}\n${playersSummary}`;
+  }, [gameSettings]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-sky-100">
-      <AppHeader />
-      <main className="flex-grow flex flex-col items-center justify-start pt-6 sm:pt-10 pb-8 px-4 w-full">
-        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg space-y-6">
-          <header className="text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold text-sky-700">Set Player Names</h1>
-            <GameSettingsDisplay gameSettings={gameSettings} />
-          </header>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {editablePlayers.map((player, index) => (
-              <PlayerNameInput
-                key={player.id}
-                playerId={player.id}
-                playerIndex={index}
-                currentName={player.name}
-                onStateChange={handlePlayerNameStateChange}
-                maxLength={50}
-              />
-            ))}
+    <SetupScreenLayout>
+      <SetupScreenHeader 
+        mainText="Set Player Names"
+        subText={subHeaderText}
+      />
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {editablePlayers.map((player, index) => (
+          <PlayerNameInput
+            key={player.id}
+            playerId={player.id}
+            playerIndex={index}
+            currentName={player.name}
+            onStateChange={handlePlayerNameStateChange}
+            maxLength={50}
+          />
+        ))}
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button type="button" onClick={onBack} variant="secondary" className="w-full sm:w-auto">
-                Back
-              </Button>
-              <Button 
-                type="submit" 
-                variant="primary" 
-                className="w-full sm:flex-grow py-3 text-lg"
-                disabled={isAnyNameInvalid}
-              >
-                Start Game Session
-              </Button>
-            </div>
-          </form>
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <Button type="button" onClick={onBack} variant="secondary" className="w-full sm:w-auto">
+            Back
+          </Button>
+          <Button 
+            type="submit" 
+            variant="primary" 
+            className="w-full sm:flex-grow py-3 text-lg"
+            disabled={isAnyNameInvalid}
+          >
+            Start Game Session
+          </Button>
         </div>
-      </main>
-      <AppFooter />
-    </div>
+      </form>
+    </SetupScreenLayout>
   );
 };
 

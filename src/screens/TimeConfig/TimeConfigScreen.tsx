@@ -2,11 +2,11 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameSettings } from '../../types';
 import Button from '../../components/Button';
 import TimerDisplay from '../../components/TimerDisplay';
-import AppHeader from '../../components/AppHeader'; 
-import AppFooter from '../../components/AppFooter'; // Import the new footer
 import { playNavigateForwardSound } from '../../audioUtils';
 import SessionTimeInput from './SessionTimeInput';
 import RoundsInput from './RoundsInput'; 
+import SetupScreenLayout from '../../components/SetupScreenLayout';
+import SetupScreenHeader from '../../components/SetupScreenHeader'; // Import the new header
 
 interface TimeConfigScreenProps {
   onSaveSettings: (settings: Omit<GameSettings, 'numberOfPlayers'>) => void;
@@ -90,98 +90,92 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
     onSaveSettings(timeSettingsToSave);
   };
   
+  const subHeaderText = `For ${numberOfPlayersFromProps} player${numberOfPlayersFromProps !== 1 ? 's' : ''}.`;
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-sky-100">
-      <AppHeader />
-      <main className="flex-grow flex flex-col items-center justify-start pt-6 sm:pt-10 pb-8 px-4 w-full">
-        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg space-y-6">
-          <header className="text-center mb-6">
-              <h1 className="text-2xl sm:text-3xl font-bold text-sky-700">Configure Game Time</h1>
-              <p className="text-md text-slate-600 mt-1">
-                  For {numberOfPlayersFromProps} player{numberOfPlayersFromProps !== 1 ? 's' : ''}.
-              </p>
-          </header>
+    <SetupScreenLayout>
+      <SetupScreenHeader 
+        mainText="Configure Game Time" 
+        subText={subHeaderText}
+      />
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="p-4 border border-slate-200 rounded-lg space-y-4 bg-slate-50/50">
+          <h2 className="text-lg font-semibold text-sky-600">
+            Session Duration & Rounds
+          </h2>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="p-4 border border-slate-200 rounded-lg space-y-4 bg-slate-50/50">
-              <h2 className="text-lg font-semibold text-sky-600">
-                Session Duration & Rounds
-              </h2>
-              
-              <SessionTimeInput
-                id="sessionTimeAdv"
-                label="Total Session Time (HH:MM or H)"
-                initialHours={sessionHours}
-                initialMinutes={sessionMinutes}
-                onTimeChange={handleSessionTimeChange}
-                placeholder="e.g., 01:30 or 2"
-              />
-              
-              <RoundsInput
-                id="numRounds"
-                initialValue={numRounds}
-                onValueChange={handleNumRoundsChange}
-              />
-              
-              {numRounds > 1 && (
-                <div className="space-y-3 pt-2">
-                    <div className="flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            id="carryOverTime"
-                            checked={carryOverTime}
-                            onChange={(e) => setCarryOverTime(e.target.checked)}
-                            className="h-4 w-4 bg-white text-sky-600 border-slate-300 rounded focus:ring-sky-500"
-                            style={{ colorScheme: 'light' }}
-                        />
-                        <label htmlFor="carryOverTime" className="text-sm font-medium text-slate-700">
-                            Carry over unused round time to next round
-                        </label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            id="payOverdueTime"
-                            checked={payOverdueTime}
-                            onChange={(e) => setPayOverdueTime(e.target.checked)}
-                            className="h-4 w-4 bg-white text-sky-600 border-slate-300 rounded focus:ring-sky-500"
-                            style={{ colorScheme: 'light' }}
-                        />
-                        <label htmlFor="payOverdueTime" className="text-sm font-medium text-slate-700">
-                            Use unused round time to pay off accumulated overdue
-                        </label>
-                    </div>
+          <SessionTimeInput
+            id="sessionTimeAdv"
+            label="Total Session Time (HH:MM or H)"
+            initialHours={sessionHours}
+            initialMinutes={sessionMinutes}
+            onTimeChange={handleSessionTimeChange}
+            placeholder="e.g., 01:30 or 2"
+          />
+          
+          <RoundsInput
+            id="numRounds"
+            initialValue={numRounds}
+            onValueChange={handleNumRoundsChange}
+          />
+          
+          {numRounds > 1 && (
+            <div className="space-y-3 pt-2">
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        id="carryOverTime"
+                        checked={carryOverTime}
+                        onChange={(e) => setCarryOverTime(e.target.checked)}
+                        className="h-4 w-4 bg-white text-sky-600 border-slate-300 rounded focus:ring-sky-500"
+                        style={{ colorScheme: 'light' }}
+                    />
+                    <label htmlFor="carryOverTime" className="text-sm font-medium text-slate-700">
+                        Carry over unused round time to next round
+                    </label>
                 </div>
-              )}
+
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        id="payOverdueTime"
+                        checked={payOverdueTime}
+                        onChange={(e) => setPayOverdueTime(e.target.checked)}
+                        className="h-4 w-4 bg-white text-sky-600 border-slate-300 rounded focus:ring-sky-500"
+                        style={{ colorScheme: 'light' }}
+                    />
+                    <label htmlFor="payOverdueTime" className="text-sm font-medium text-slate-700">
+                        Use unused round time to pay off accumulated overdue
+                    </label>
+                </div>
+            </div>
+          )}
 
 
-              {estimatedTimePerPlayerPerRound > 0 && !sessionTimeError && !numRoundsError && (
-                  <div className="p-3 bg-sky-50 border border-sky-200 rounded-lg text-center">
-                  <p className="text-sm text-sky-600">Approx. Time per Player per Round:</p>
-                  <TimerDisplay timeInSeconds={estimatedTimePerPlayerPerRound} className="text-xl font-semibold text-sky-700" />
-                  </div>
-              )}
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button type="button" onClick={onBackToPlayerCount} variant="secondary" className="w-full sm:w-auto">
-                Back
-              </Button>
-              <Button 
-                type="submit" 
-                variant="primary" 
-                className="w-full sm:flex-grow py-3 text-lg"
-                disabled={!!sessionTimeError || !!numRoundsError}
-              >
-                Next: Set Player Names
-              </Button>
-            </div>
-          </form>
+          {estimatedTimePerPlayerPerRound > 0 && !sessionTimeError && !numRoundsError && (
+              <div className="p-3 bg-sky-50 border border-sky-200 rounded-lg text-center">
+              <p className="text-sm text-sky-600">Approx. Time per Player per Round:</p>
+              <TimerDisplay timeInSeconds={estimatedTimePerPlayerPerRound} className="text-xl font-semibold text-sky-700" />
+              </div>
+          )}
         </div>
-      </main>
-      <AppFooter />
-    </div>
+        
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <Button type="button" onClick={onBackToPlayerCount} variant="secondary" className="w-full sm:w-auto">
+            Back
+          </Button>
+          <Button 
+            type="submit" 
+            variant="primary" 
+            className="w-full sm:flex-grow py-3 text-lg"
+            disabled={!!sessionTimeError || !!numRoundsError}
+          >
+            Next: Set Player Names
+          </Button>
+        </div>
+      </form>
+    </SetupScreenLayout>
   );
 };
 
