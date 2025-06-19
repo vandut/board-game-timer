@@ -1,4 +1,3 @@
-// components/AppHeader.tsx
 import React from 'react';
 
 const AppHeader: React.FC = () => {

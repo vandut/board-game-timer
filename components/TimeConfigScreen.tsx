@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { GameSettings } from '../types';
 import Button from './Button';

@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface InputNumberProps extends React.InputHTMLAttributes<HTMLInputElement> {

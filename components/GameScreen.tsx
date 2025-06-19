@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Player, GameSettings } from '../types';
 import PlayerTimerBox from './PlayerTimerBox';

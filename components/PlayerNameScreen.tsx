@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Player, GameSettings } from '../types';
 import Button from './Button';
