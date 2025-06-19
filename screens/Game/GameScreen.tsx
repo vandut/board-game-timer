@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { Player, GameSettings } from '../types';
+import { Player, GameSettings } from '../../types';
 import PlayerTimerBox from './PlayerTimerBox';
-import Button from './Button';
-import TimerDisplay from './TimerDisplay'; 
+import Button from '../../components/Button';
+import TimerDisplay from '../../components/TimerDisplay'; 
 
 interface GameScreenProps {
   gameSettings: GameSettings;

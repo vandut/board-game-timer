@@ -1,16 +1,16 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import PlayerCountScreen from './components/PlayerCountScreen';
-import TimeConfigScreen from './components/TimeConfigScreen';
-import PlayerNameScreen from './components/PlayerNameScreen';
-import GameScreen from './components/GameScreen';
+import PlayerCountScreen from './screens/PlayerCount/PlayerCountScreen';
+import TimeConfigScreen from './screens/TimeConfig/TimeConfigScreen';
+import PlayerNameScreen from './screens/PlayerName/PlayerNameScreen';
+import GameScreen from './screens/Game/GameScreen';
 import { Player, GameSettings } from './types';
 
 // Define a type for the settings passed to TimeConfigScreen for initialization
 type TimeConfigInitialSettings = Partial<Omit<GameSettings, 'numberOfPlayers'>> & {
   numberOfPlayers: number;
   carryOverUnusedTime?: boolean; 
-  payOverdueWithUnusedRoundTime?: boolean; // Ensure this is part of the type
+  payOverdueWithUnusedRoundTime?: boolean;
 };
 
 

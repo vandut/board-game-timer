@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { GameSettings } from '../types';
-import Button from './Button';
-import TimerDisplay from './TimerDisplay';
-import AppHeader from './AppHeader'; 
-import { playNavigateForwardSound } from '../audioUtils';
+import { GameSettings } from '../../types';
+import Button from '../../components/Button';
+import TimerDisplay from '../../components/TimerDisplay';
+import AppHeader from '../../components/AppHeader'; 
+import { playNavigateForwardSound } from '../../audioUtils';
 
 // Helper function to parse and validate HH:MM time string
 const parseTimeInput = (timeValue: string): { majorUnit: number; minorUnit: number; isValid: boolean; error?: string; formatted?: string } => {

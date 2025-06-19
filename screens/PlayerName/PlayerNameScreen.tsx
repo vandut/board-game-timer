@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Player, GameSettings } from '../types';
-import Button from './Button';
-import AppHeader from './AppHeader';
-import { playNavigateForwardSound } from '../audioUtils';
+import { Player, GameSettings } from '../../types';
+import Button from '../../components/Button';
+import AppHeader from '../../components/AppHeader';
+import { playNavigateForwardSound } from '../../audioUtils';
 
 const formatGameSettingsForDisplay = (settings: GameSettings): string => {
   const { 

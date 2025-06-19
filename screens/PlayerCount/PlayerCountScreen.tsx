@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import Button from './Button';
-import AppHeader from './AppHeader'; 
-import { playNavigateForwardSound } from '../audioUtils';
+import Button from '../../components/Button';
+import AppHeader from '../../components/AppHeader'; 
+import { playNavigateForwardSound } from '../../audioUtils';
 
 interface PlayerCountScreenProps {
   onProceedToTimeConfig: (numPlayers: number) => void;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Player } from '../types';
-import TimerDisplay, { formatTime } from './TimerDisplay'; 
+import { Player } from '../../types';
+import TimerDisplay, { formatTime } from '../../components/TimerDisplay'; 
 
 interface PlayerTimerBoxProps {
   player: Player; 
