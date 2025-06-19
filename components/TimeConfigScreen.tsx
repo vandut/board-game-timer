@@ -2,11 +2,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { GameSettings } from '../types';
 import Button from './Button';
-// InputNumber is no longer used for rounds, but might be used elsewhere or in future.
-// import InputNumber from './InputNumber'; 
 import TimerDisplay from './TimerDisplay';
 import AppHeader from './AppHeader'; 
-import { playNavigateForwardSound } from '../audioUtils'; // Updated import
+import { playNavigateForwardSound } from '../audioUtils';
 
 // Helper function to parse and validate HH:MM time string
 const parseTimeInput = (timeValue: string): { majorUnit: number; minorUnit: number; isValid: boolean; error?: string; formatted?: string } => {
@@ -69,8 +67,8 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
   const [sessionTimeError, setSessionTimeError] = useState<string | null>(null);
   const sessionTimeInputRef = useRef<HTMLInputElement>(null);
   
-  const [actualNumRounds, setActualNumRounds] = useState<number>(1); // Renamed from numRounds
-  const [numRoundsDisplayValue, setNumRoundsDisplayValue] = useState<string>("1"); // New state for input display
+  const [actualNumRounds, setActualNumRounds] = useState<number>(1);
+  const [numRoundsDisplayValue, setNumRoundsDisplayValue] = useState<string>("1");
   const numRoundsInputRef = useRef<HTMLInputElement>(null); // Ref for num rounds input
 
   const [carryOverTime, setCarryOverTime] = useState<boolean>(true); 
@@ -205,7 +203,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
   };
 
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let isValidForm = true;
     let currentFormErrors: string[] = [];
@@ -238,11 +236,10 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
             carryOverUnusedTime: actualNumRounds > 1 ? carryOverTime : false, 
             payOverdueWithUnusedRoundTime: actualNumRounds > 1 ? payOverdueTime : false,
         };
-        playNavigateForwardSound(); // Use the new specific function
+        await playNavigateForwardSound();
         onSaveSettings(timeSettingsToSave);
       } else {
         setSessionTimeError(finalParsedTime.error || "Double check session time.");
-        // alert("Please ensure session time is valid."); // Alert removed, error message is shown
       }
     }
   };

@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Player, GameSettings } from '../types';
 import Button from './Button';
-import AppHeader from './AppHeader'; // Import the new header
-import { playNavigateForwardSound } from '../audioUtils'; // Updated import
+import AppHeader from './AppHeader';
+import { playNavigateForwardSound } from '../audioUtils';
 
 const formatGameSettingsForDisplay = (settings: GameSettings): string => {
   const { 
@@ -95,13 +95,13 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editablePlayers.some(p => p.name.trim() === '')) {
         alert('All players must have a name.');
         return;
     }
-    playNavigateForwardSound(); // Use the new specific function
+    await playNavigateForwardSound();
     onConfirm(editablePlayers);
   };
 

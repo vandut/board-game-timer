@@ -1,9 +1,8 @@
 
 import React, { useState, useRef } from 'react';
 import Button from './Button';
-// InputNumber is no longer used directly for this input
 import AppHeader from './AppHeader'; 
-import { playNavigateForwardSound } from '../audioUtils'; // Updated import
+import { playNavigateForwardSound } from '../audioUtils';
 
 interface PlayerCountScreenProps {
   onProceedToTimeConfig: (numPlayers: number) => void;
@@ -78,13 +77,13 @@ const PlayerCountScreen: React.FC<PlayerCountScreenProps> = ({ onProceedToTimeCo
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Ensure final validation on submit using the blur logic
     handleNumPlayersBlur(); 
     // Check error state after blur handles final validation
     if (!playerInputError) { 
-        playNavigateForwardSound(); // Use the new specific function
+        await playNavigateForwardSound();
         // Use numPlayersInternal as it's the validated number
         onProceedToTimeConfig(numPlayersInternal); 
     }

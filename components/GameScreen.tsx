@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react'; // Removed useState
+import React, { useEffect } from 'react';
 import { Player, GameSettings } from '../types';
 import PlayerTimerBox from './PlayerTimerBox';
 import Button from './Button';
@@ -7,15 +7,15 @@ import TimerDisplay from './TimerDisplay';
 
 interface GameScreenProps {
   gameSettings: GameSettings;
-  players: Player[]; // Changed from initialPlayers
-  activePlayerId: number | null; // Changed from initialActivePlayerId
+  players: Player[];
+  activePlayerId: number | null;
   sessionTimeRemaining: number; 
   sessionTimeOverdue: number;   
   currentRound: number;         
   totalGameTimeElapsed: number; 
   onPlayerSelect: (playerId: number) => void;
   onResetGame: () => void;
-  onPlayerActiveTick: (playerId: number) => void; // Changed from onUpdatePlayerTime
+  onPlayerActiveTick: (playerId: number) => void;
   onAdvanceRound?: () => void; 
 }
 
@@ -34,19 +34,17 @@ const formatSessionFooterInfo = (settings: GameSettings, players: Player[]): str
 
 const GameScreen: React.FC<GameScreenProps> = ({
   gameSettings,
-  players, // Use prop directly
-  activePlayerId, // Use prop directly
+  players,
+  activePlayerId,
   sessionTimeRemaining, 
   sessionTimeOverdue,   
   currentRound,
   totalGameTimeElapsed,
   onPlayerSelect,
   onResetGame,
-  onPlayerActiveTick, // Use new prop
+  onPlayerActiveTick,
   onAdvanceRound,
 }) => {
-  // Removed local useState for players and activePlayerId
-  // Removed useEffects that set local state from initialPlayers/initialActivePlayerId
 
   useEffect(() => {
     if (activePlayerId === null) {

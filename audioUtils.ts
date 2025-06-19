@@ -1,7 +1,7 @@
 // audioUtils.ts
 
 // Generic sound playing function
-export const playSound = (soundFile: string): void => {
+export const playSound = (soundFile: string, delayMs?: number): Promise<void> => {
   try {
     const audio = new Audio(soundFile);
     audio.play().catch(error => {
@@ -13,9 +13,15 @@ export const playSound = (soundFile: string): void => {
     // Catch errors related to new Audio() e.g. if soundFile is invalid or network error
     console.warn(`Failed to initialize audio for ${soundFile}: ${error.name} - ${error.message}`);
   }
+
+  if (delayMs && delayMs > 0) {
+    return new Promise(resolve => setTimeout(resolve, delayMs));
+  } else {
+    return Promise.resolve();
+  }
 };
 
 // Specific sound for forward navigation
-export const playNavigateForwardSound = (): void => {
-  playSound('/board-game-timer/sounds/navigate_forward.mp3');
+export const playNavigateForwardSound = (): Promise<void> => {
+  return playSound('/board-game-timer/sounds/navigate_forward.mp3', 100);
 };
