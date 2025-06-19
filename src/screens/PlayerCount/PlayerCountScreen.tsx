@@ -12,20 +12,6 @@ const PlayerCountScreen: React.FC<PlayerCountScreenProps> = ({ onProceedToTimeCo
   const [numPlayersDisplayValue, setNumPlayersDisplayValue] = useState<string>("4"); // String value for input
   const [playerInputError, setPlayerInputError] = useState<string | null>(null);
   const numPlayersInputRef = useRef<HTMLInputElement>(null);
-
-  const validateAndSetNumPlayers = (value: string): number => {
-    const parsed = parseInt(value, 10);
-    if (isNaN(parsed) || parsed < 1) {
-      setPlayerInputError("Number of players must be at least 1.");
-      return 1;
-    }
-    if (parsed > 16) {
-      setPlayerInputError("Number of players cannot exceed 16.");
-      return 16;
-    }
-    setPlayerInputError(null);
-    return parsed;
-  };
   
   const handleNumPlayersDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
