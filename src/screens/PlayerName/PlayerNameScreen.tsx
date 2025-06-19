@@ -3,40 +3,8 @@ import { Player, GameSettings } from '../../types';
 import Button from '../../components/Button';
 import AppHeader from '../../components/AppHeader';
 import { playNavigateForwardSound } from '../../audioUtils';
-
-const formatGameSettingsForDisplay = (settings: GameSettings): string => {
-  const { 
-    totalSessionTimeHours: hours, 
-    totalSessionTimeMinutes: minutes, 
-    numberOfRounds, 
-    carryOverUnusedTime,
-    payOverdueWithUnusedRoundTime 
-  } = settings;
-  const hrText = `${hours} hour${hours !== 1 ? 's' : ''}`;
-  const minText = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-  let durationStr = "0 minutes";
-
-  if (hours > 0 && minutes > 0) {
-    durationStr = `${hrText} ${minText}`;
-  } else if (hours > 0) {
-    durationStr = hrText;
-  } else if (minutes > 0) {
-    durationStr = minText;
-  }
-  
-  const roundsStr = `${numberOfRounds} round${numberOfRounds !== 1 ? 's' : ''}`;
-  
-  let featuresStr = "";
-  if (numberOfRounds > 1) {
-    const carryOverStr = carryOverUnusedTime ? "Unused round time carries over." : "Unused round time is lost.";
-    const payOverdueStr = payOverdueWithUnusedRoundTime ? "Can pay overdue with unused round time." : "Cannot pay overdue with unused round time.";
-    featuresStr = `${carryOverStr} ${payOverdueStr}`;
-  } else {
-    featuresStr = "Single round game.";
-  }
-  
-  return `Total Session: ${durationStr} over ${roundsStr}. ${featuresStr}`;
-};
+import PlayerNameInput from './PlayerNameInput';
+import GameSettingsDisplay from './GameSettingsDisplay'; // Import the new component
 
 interface PlayerNameScreenProps {
   initialPlayers: Player[];
@@ -85,14 +53,6 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
     );
   };
 
-  const handleClearPlayerName = (playerId: number) => {
-    handleNameChange(playerId, '');
-    const inputElement = document.getElementById(`player-name-${playerId}`);
-    if (inputElement) {
-      inputElement.focus();
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editablePlayers.some(p => p.name.trim() === '')) {
@@ -124,45 +84,20 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg space-y-6">
           <header className="text-center">
             <h1 className="text-2xl sm:text-3xl font-bold text-sky-700">Set Player Names</h1>
-            {gameSettings && (
-              <p className="text-sm text-slate-600 mt-1 leading-relaxed">
-                {formatGameSettingsForDisplay(gameSettings)} <br />
-                {gameSettings.numberOfPlayers} player{gameSettings.numberOfPlayers !==1 ? 's' : ''}.
-              </p>
-            )}
+            <GameSettingsDisplay gameSettings={gameSettings} />
           </header>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="max-h-[50vh] overflow-y-auto pr-2 space-y-4">
               {editablePlayers.map((player, index) => (
-                <div key={player.id} className="flex flex-col">
-                  <label htmlFor={`player-name-${player.id}`} className="mb-1 text-sm font-medium text-slate-600">
-                    Player {index + 1} Name
-                  </label>
-                  <div className="relative w-full">
-                    <input
-                      type="text"
-                      id={`player-name-${player.id}`}
-                      value={player.name}
-                      onChange={(e) => handleNameChange(player.id, e.target.value)}
-                      className="p-3 pr-10 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-colors w-full bg-white text-slate-900 placeholder-slate-400"
-                      style={{ colorScheme: 'light' }}
-                      required
-                      maxLength={50}
-                    />
-                    {player.name && (
-                      <button
-                        type="button"
-                        onClick={() => handleClearPlayerName(player.id)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xl font-sans"
-                        aria-label={`Clear Player ${index + 1} Name`}
-                        tabIndex={-1} 
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                </div>
+                <PlayerNameInput
+                  key={player.id}
+                  playerId={player.id}
+                  playerIndex={index}
+                  currentName={player.name}
+                  onNameChange={handleNameChange}
+                  maxLength={50}
+                />
               ))}
             </div>
 
