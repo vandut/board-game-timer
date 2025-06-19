@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Player, GameSettings } from '../types';
 import Button from './Button';
 import AppHeader from './AppHeader'; // Import the new header
-import { playSound } from '../audioUtils'; // Adjusted path for root audioUtils.ts
+import { playNavigateForwardSound } from '../audioUtils'; // Updated import
 
 const formatGameSettingsForDisplay = (settings: GameSettings): string => {
   const { 
@@ -101,7 +101,7 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
         alert('All players must have a name.');
         return;
     }
-    playSound('/board-game-timer/sounds/navigate_forward.mp3');
+    playNavigateForwardSound(); // Use the new specific function
     onConfirm(editablePlayers);
   };
 

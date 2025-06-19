@@ -1,12 +1,21 @@
 // audioUtils.ts
+
+// Generic sound playing function
 export const playSound = (soundFile: string): void => {
   try {
     const audio = new Audio(soundFile);
     audio.play().catch(error => {
-      // Log errors, but don't block UI or app flow
+      // Log errors related to playback, but don't block UI or app flow
+      // Common errors: NotAllowedError (user hasn't interacted), NotSupportedError
       console.warn(`Audio playback failed for ${soundFile}: ${error.name} - ${error.message}`);
     });
-  } catch (error: any) { // Catch unknown error type for broader compatibility
-    console.warn(`Failed to initialize or play audio ${soundFile}: ${error.name} - ${error.message}`);
+  } catch (error: any) { 
+    // Catch errors related to new Audio() e.g. if soundFile is invalid or network error
+    console.warn(`Failed to initialize audio for ${soundFile}: ${error.name} - ${error.message}`);
   }
+};
+
+// Specific sound for forward navigation
+export const playNavigateForwardSound = (): void => {
+  playSound('/board-game-timer/sounds/navigate_forward.mp3');
 };

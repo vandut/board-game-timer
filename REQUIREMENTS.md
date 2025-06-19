@@ -82,11 +82,11 @@ The application utilizes several timers to manage game flow:
 
 ## 3. Application Screens and Flows
 
-A consistent **App Header** displaying "Board Game Timer" is present on the Player Count, Time Configuration, and Player Name screens.
+A consistent **App Header** displaying "Board Game Timer" is present on the Player Count, Time Configuration, and Player Name screens. (Component: `components/AppHeader.tsx`)
 
 ### 3.1. Player Count Screen
 
-*   **Component:** `PlayerCountScreen.tsx`
+*   **Component:** `components/PlayerCountScreen.tsx`
 *   **Purpose:** To set the number of players for the game. This is the first screen in the setup process.
 *   **Inputs & Validations:**
     *   **Number of Players:**
@@ -103,7 +103,7 @@ A consistent **App Header** displaying "Board Game Timer" is present on the Play
 
 ### 3.2. Time Configuration Screen
 
-*   **Component:** `TimeConfigScreen.tsx`
+*   **Component:** `components/TimeConfigScreen.tsx`
 *   **Purpose:** To configure the total session duration, number of rounds, and advanced round-based time rules.
 *   **Displayed Information (from previous screen):**
     *   Number of players selected.
@@ -134,7 +134,7 @@ A consistent **App Header** displaying "Board Game Timer" is present on the Play
 
 ### 3.3. Player Name Screen
 
-*   **Component:** `PlayerNameScreen.tsx`
+*   **Component:** `components/PlayerNameScreen.tsx`
 *   **Purpose:** To allow users to enter custom names for each player.
 *   **Displayed Information (from previous screen/settings):**
     *   A summary of the game settings: total session duration, number of rounds, number of players, and status of carry-over/pay-overdue features.
@@ -156,7 +156,7 @@ A consistent **App Header** displaying "Board Game Timer" is present on the Play
 
 ### 3.4. Game Screen
 
-*   **Component:** `GameScreen.tsx`
+*   **Component:** `components/GameScreen.tsx`
 *   **Purpose:** The main interactive screen where gameplay and timers are active.
 *   **Displayed Information (Header Section - Sticky):**
     *   **Round Indicator:** "Round X / Y" (e.g., "Round 1 / 5").
@@ -166,7 +166,7 @@ A consistent **App Header** displaying "Board Game Timer" is present on the Play
     *   **Game Controls:** "Advance to Next Round" (if applicable) and "Reset Game" buttons.
 *   **Displayed Information (Main Area - Player Timers):**
     *   A grid of **Player Timer Boxes**, one for each player. The number of columns in the grid adjusts responsively based on the number of players.
-    *   Each **PlayerTimerBox (`PlayerTimerBox.tsx`)** displays:
+    *   Each **PlayerTimerBox (`components/PlayerTimerBox.tsx`)** displays:
         *   Player's Name.
         *   Player's Current Round Time Remaining: Large, prominent display. Color may change (e.g., to red) if time is negative/overdue.
         *   "(Current Round)" label below round time if multiple rounds.
@@ -229,6 +229,10 @@ React is the core framework for building the UI components and managing state.
 Typescript is used for type safety.
 ESM modules are used for JavaScript, with dependencies loaded from `esm.sh`.
 The app uses standard HTML, CSS, and JavaScript, runnable in a web browser.
-The `index.html` file sets up the basic page structure, loads Tailwind CSS, and initializes the React application.
+The `index.html` file sets up the basic page structure, loads Tailwind CSS, and initializes the React application via `index.tsx`.
 The `metadata.json` seems to be for a specific platform or tool that uses it to understand the app's capabilities and permissions. Currently, it requests no special frame permissions.
 The application assumes the `API_KEY` environment variable is pre-configured if any Gemini API features were to be added; however, no such features are currently implemented. The provided code does not use `@google/genai`.
+The main application logic and screen orchestration is handled in `App.tsx`.
+Reusable UI components like `Button.tsx`, `TimerDisplay.tsx`, etc., are located in the `components/` directory.
+Type definitions for shared data structures like `Player` and `GameSettings` are in `types.ts`.
+The entry point for the React application is `index.tsx`.
