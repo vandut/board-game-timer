@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import BaseInput from '../../components/BaseInput'; // Import BaseInput
 
 interface RoundsInputProps {
   id: string;
@@ -122,51 +123,23 @@ const RoundsInput: React.FC<RoundsInputProps> = ({
     }
   };
 
-  const errorId = `${id}-error`;
-
   return (
-    <div>
-      <label htmlFor={id} className="block mb-1 text-sm font-medium text-slate-600">
-        {label}
-      </label>
-      <div className="relative w-full">
-        <input
-          ref={inputRef}
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          id={id}
-          value={displayValue}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          className={`p-3 pr-10 border rounded-lg shadow-sm focus:ring-2 focus:border-sky-500 outline-none transition-colors w-full bg-white text-slate-900 placeholder-slate-400 ${
-            error ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-sky-500'
-          }`}
-          style={{ colorScheme: 'light' }}
-          required
-          aria-describedby={error ? errorId : undefined}
-          aria-invalid={!!error}
-          maxLength={maxLength}
-        />
-        {displayValue && (
-          <button
-            type="button"
-            onClick={handleClearInput}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xl font-sans"
-            aria-label={`Clear ${label}`}
-            tabIndex={-1}
-          >
-            &#x2715;
-          </button>
-        )}
-      </div>
-      {error && (
-        <p id={errorId} className="mt-1 text-xs text-red-600">
-          {error}
-        </p>
-      )}
-    </div>
+    <BaseInput
+      id={id}
+      label={label}
+      value={displayValue}
+      onChange={handleInputChange}
+      onBlur={handleBlur}
+      onClear={handleClearInput}
+      error={error}
+      placeholder={placeholder}
+      maxLength={maxLength}
+      inputMode="numeric"
+      pattern="[0-9]*"
+      required
+      inputRef={inputRef}
+      type="text" 
+    />
   );
 };
 
