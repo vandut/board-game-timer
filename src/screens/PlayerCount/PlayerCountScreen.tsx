@@ -1,77 +1,35 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import Button from '../../components/Button';
 import AppHeader from '../../components/AppHeader'; 
 import { playNavigateForwardSound } from '../../audioUtils';
+import PlayerCountInput from './PlayerCountInput'; // Import the new component
 
 interface PlayerCountScreenProps {
   onProceedToTimeConfig: (numPlayers: number) => void;
 }
 
 const PlayerCountScreen: React.FC<PlayerCountScreenProps> = ({ onProceedToTimeConfig }) => {
-  const [numPlayersInternal, setNumPlayersInternal] = useState<number>(4); // Validated internal number
-  const [numPlayersDisplayValue, setNumPlayersDisplayValue] = useState<string>("4"); // String value for input
+  const [validatedNumPlayers, setValidatedNumPlayers] = useState<number>(4);
   const [playerInputError, setPlayerInputError] = useState<string | null>(null);
-  const numPlayersInputRef = useRef<HTMLInputElement>(null);
   
-  const handleNumPlayersDisplayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    const filteredValue = inputValue.replace(/[^0-9]/g, ''); // Allow only digits
-    setNumPlayersDisplayValue(filteredValue);
-    setPlayerInputError(null); // Clear error on change
-
-    if (filteredValue === '') {
-        // Allow empty state during typing, internal value might default or wait for blur
-        setNumPlayersInternal(1); // Default internal for safety if needed before blur
-    } else {
-        const parsed = parseInt(filteredValue, 10);
-        if (!isNaN(parsed)) {
-            if (parsed >= 1 && parsed <= 16) {
-                setNumPlayersInternal(parsed);
-            } else if (parsed > 16) {
-                setNumPlayersInternal(16); // Cap for internal use
-            } else { // parsed < 1
-                setNumPlayersInternal(1); // Default for internal use
-            }
-        } else {
-             setNumPlayersInternal(1); // Default if somehow NaN after filtering
-        }
-    }
-  };
-
-  const handleNumPlayersBlur = () => {
-    let val = parseInt(numPlayersDisplayValue, 10);
-    if (isNaN(val) || val < 1) {
-        val = 1;
-        setPlayerInputError("Number of players must be at least 1.");
-    } else if (val > 16) {
-        val = 16;
-        setPlayerInputError("Number of players cannot exceed 16.");
-    } else {
-         setPlayerInputError(null);
-    }
-    setNumPlayersInternal(val);
-    setNumPlayersDisplayValue(String(val));
-  };
-
-  const handleClearNumPlayersInput = () => {
-    setNumPlayersDisplayValue('');
-    setNumPlayersInternal(1); // Reset internal to default
-    setPlayerInputError(null);
-    if (numPlayersInputRef.current) {
-        numPlayersInputRef.current.focus();
-    }
-  };
+  const handlePlayerCountChange = useCallback((value: number, error: string | null) => {
+    setValidatedNumPlayers(value);
+    setPlayerInputError(error);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Ensure final validation on submit using the blur logic
-    handleNumPlayersBlur(); 
-    // Check error state after blur handles final validation
+    // PlayerCountInput handles its own validation and passes up an error state.
+    // If there's no error, we can proceed.
     if (!playerInputError) { 
         await playNavigateForwardSound();
-        // Use numPlayersInternal as it's the validated number
-        onProceedToTimeConfig(numPlayersInternal); 
+        // validatedNumPlayers is the numeric value received from PlayerCountInput's callback.
+        // If playerInputError is null, PlayerCountInput has confirmed this value is valid.
+        onProceedToTimeConfig(validatedNumPlayers); 
     }
+    // No 'else' block needed here. The button is disabled if playerInputError is not null.
+    // If the form were submitted with an error (e.g., if JS for button disabling failed),
+    // this check prevents proceeding.
   };
 
   return (
@@ -82,46 +40,23 @@ const PlayerCountScreen: React.FC<PlayerCountScreenProps> = ({ onProceedToTimeCo
           <h1 className="text-3xl font-bold text-center text-sky-700 mb-6">Player Count Setup</h1>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="numPlayers" className="block mb-1 text-sm font-medium text-slate-600">
-                Number of Players (1-16)
-              </label>
-              <div className="relative w-full">
-                <input
-                  ref={numPlayersInputRef}
-                  type="text" 
-                  id="numPlayers"
-                  value={numPlayersDisplayValue}
-                  onChange={handleNumPlayersDisplayChange}
-                  onBlur={handleNumPlayersBlur}
-                  placeholder="1-16"
-                  className={`p-3 pr-10 border rounded-lg shadow-sm focus:ring-2 focus:border-sky-500 outline-none transition-colors w-full bg-white text-slate-900 placeholder-slate-400 ${
-                    playerInputError ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-sky-500'
-                  }`}
-                  style={{ colorScheme: 'light' }}
-                  required
-                  aria-describedby="player-input-error"
-                  maxLength={2} // Max 2 digits for 1-16
-                />
-                {numPlayersDisplayValue && (
-                  <button
-                    type="button"
-                    onClick={handleClearNumPlayersInput}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xl font-sans"
-                    aria-label="Clear number of players"
-                    tabIndex={-1}
-                  >&#x2715;</button> 
-                )}
-              </div>
-              {playerInputError && (
-                  <p id="player-input-error" className="mt-1 text-xs text-red-600">
-                    {playerInputError}
-                  </p>
-              )}
-            </div>
+            <PlayerCountInput
+              id="numPlayers"
+              label="Number of Players (1-16)"
+              initialValue={validatedNumPlayers} // PlayerCountInput will validate this initial value
+              onValueChange={handlePlayerCountChange}
+              min={1}
+              max={16}
+              maxLength={2}
+            />
             
             <div className="space-y-3 pt-2">
-               <Button type="submit" variant="primary" className="w-full py-3 text-lg">
+               <Button 
+                  type="submit" 
+                  variant="primary" 
+                  className="w-full py-3 text-lg"
+                  disabled={!!playerInputError} // Disable button if PlayerCountInput reports an error
+                >
                   Next: Configure Time
               </Button>
             </div>
