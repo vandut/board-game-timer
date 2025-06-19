@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import PlayerCountScreen from './screens/PlayerCount/PlayerCountScreen';
 import TimeConfigScreen from './screens/TimeConfig/TimeConfigScreen';

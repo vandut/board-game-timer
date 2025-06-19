@@ -1,5 +1,3 @@
-// audioUtils.ts
-
 // Generic sound playing function
 export const playSound = (soundFile: string, delayMs?: number): Promise<void> => {
   try {
