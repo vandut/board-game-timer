@@ -17,8 +17,7 @@ const PlayerTimerBox: React.FC<PlayerTimerBoxProps> = ({ player, isActive, onSel
   let textColor = isActive ? 'text-sky-700' : 'text-slate-700';
   let borderColor = isActive ? 'border-sky-500 ring-2 ring-sky-500' : 'border-slate-300';
   let statusText = '';
-  // Status text color will match the determined textColor
-
+  
   if (isRoundOverdue) { 
     // Main box becomes red only if current round is overdue
     bgColor = isActive ? 'bg-red-300' : 'bg-red-200';
@@ -27,7 +26,7 @@ const PlayerTimerBox: React.FC<PlayerTimerBoxProps> = ({ player, isActive, onSel
     statusText = numberOfRounds > 1 ? 'ROUND OVER TIME' : 'TIME UP';
   }
 
-  const statusTextColor = textColor; // Status text color matches the main text color
+  const statusTextColor = textColor;
 
   const ariaLabel = `${player.name}, current round time: ${formatTime(player.roundTimeRemaining)}${isRoundOverdue ? (numberOfRounds > 1 ? ', round time exceeded' : ', time exceeded') : ''}${hasAccumulatedOverdue ? `, total accumulated overdue: ${formatTime(player.accumulatedOverdueTime)}` : ''}.`;
 

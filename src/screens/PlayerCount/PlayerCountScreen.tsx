@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Button from '../../components/Button';
 import AppHeader from '../../components/AppHeader'; 
 import { playNavigateForwardSound } from '../../audioUtils';
-import PlayerCountInput from './PlayerCountInput'; // Import the new component
+import PlayerCountInput from './PlayerCountInput';
 
 interface PlayerCountScreenProps {
   onProceedToTimeConfig: (numPlayers: number) => void;
@@ -55,7 +55,7 @@ const PlayerCountScreen: React.FC<PlayerCountScreenProps> = ({ onProceedToTimeCo
                   type="submit" 
                   variant="primary" 
                   className="w-full py-3 text-lg"
-                  disabled={!!playerInputError} // Disable button if PlayerCountInput reports an error
+                  disabled={!!playerInputError}
                 >
                   Next: Configure Time
               </Button>

@@ -1,4 +1,3 @@
-// Generic sound playing function
 export const playSound = (soundFile: string, delayMs?: number): Promise<void> => {
   try {
     const audio = new Audio(soundFile);
@@ -19,7 +18,6 @@ export const playSound = (soundFile: string, delayMs?: number): Promise<void> =>
   }
 };
 
-// Specific sound for forward navigation
 export const playNavigateForwardSound = (): Promise<void> => {
   return playSound('/board-game-timer/sounds/navigate_forward.mp3', 100);
 };

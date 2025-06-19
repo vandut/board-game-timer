@@ -68,7 +68,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
   
   const [actualNumRounds, setActualNumRounds] = useState<number>(1);
   const [numRoundsDisplayValue, setNumRoundsDisplayValue] = useState<string>("1");
-  const numRoundsInputRef = useRef<HTMLInputElement>(null); // Ref for num rounds input
+  const numRoundsInputRef = useRef<HTMLInputElement>(null);
 
   const [carryOverTime, setCarryOverTime] = useState<boolean>(true); 
   const [payOverdueTime, setPayOverdueTime] = useState<boolean>(true); 

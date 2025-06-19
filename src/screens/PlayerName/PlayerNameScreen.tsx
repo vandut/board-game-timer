@@ -4,7 +4,7 @@ import Button from '../../components/Button';
 import AppHeader from '../../components/AppHeader';
 import { playNavigateForwardSound } from '../../audioUtils';
 import PlayerNameInput from './PlayerNameInput';
-import GameSettingsDisplay from './GameSettingsDisplay'; // Import the new component
+import GameSettingsDisplay from './GameSettingsDisplay';
 
 interface PlayerNameScreenProps {
   initialPlayers: Player[];
