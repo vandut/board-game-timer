@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { Player, GameSettings } from '../../types';
 import Button from '../../components/Button';
 import AppHeader from '../../components/AppHeader';
@@ -19,40 +21,58 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
   onConfirm,
   onBack,
 }) => {
-  // Initialize editablePlayers directly with the initialPlayers prop.
-  // This assumes initialPlayers already has correctly calculated time properties from App.tsx.
   const [editablePlayers, setEditablePlayers] = useState<Player[]>(initialPlayers);
+  const [playerNameErrors, setPlayerNameErrors] = useState<Record<number, boolean>>({});
 
-  // If initialPlayers prop itself changes (e.g. user goes back and settings change, or initial load),
-  // ensure editablePlayers is updated to reflect the new prop.
   useEffect(() => {
     setEditablePlayers(initialPlayers);
+    const newErrors: Record<number, boolean> = {};
+    initialPlayers.forEach(player => {
+      newErrors[player.id] = player.name.trim() === '';
+    });
+    setPlayerNameErrors(newErrors);
   }, [initialPlayers]);
 
-  const handleNameChange = (playerId: number, newName: string) => {
+  const handlePlayerNameStateChange = (playerId: number, newName: string, hasError: boolean) => {
     setEditablePlayers(prevPlayers =>
       prevPlayers.map(p => (p.id === playerId ? { ...p, name: newName } : p))
     );
+    setPlayerNameErrors(prevErrors => ({
+      ...prevErrors,
+      [playerId]: hasError
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editablePlayers.some(p => p.name.trim() === '')) {
+    const isAnyInvalid = Object.values(playerNameErrors).some(err => err);
+    if (isAnyInvalid) {
+        // This alert is a fallback, button should be disabled
         alert('All players must have a name.');
         return;
     }
+    // Double check directly from editablePlayers as final source of truth for names
+    if (editablePlayers.some(p => p.name.trim() === '')) {
+        alert('All players must have a name. Please ensure all names are filled.');
+        return;
+    }
     await playNavigateForwardSound();
-    // onConfirm now passes editablePlayers which has updated names,
-    // and the time properties are those that were originally passed in via initialPlayers.
     onConfirm(editablePlayers);
   };
 
-  // This loading condition might briefly be true if initialPlayers is somehow not populated
-  // when the component first renders, before the useEffect [initialPlayers] kicks in.
-  // However, App.tsx should ensure initialPlayers is populated before navigating here.
+  const isAnyNameInvalid = useMemo(() => {
+    // Ensure all players have an error status initialized.
+    // If not (e.g., during initial setup), consider it invalid to be safe.
+    if (gameSettings.numberOfPlayers > 0 && Object.keys(playerNameErrors).length !== gameSettings.numberOfPlayers) {
+      return true;
+    }
+    return Object.values(playerNameErrors).some(hasError => hasError);
+  }, [playerNameErrors, gameSettings.numberOfPlayers]);
+
+
   if (!editablePlayers.length && gameSettings.numberOfPlayers > 0) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-100 to-blue-100">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-sky-100">
         <AppHeader />
         <main className="flex-grow flex items-center justify-center p-4">
           Loading player setup...
@@ -65,7 +85,7 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-100 to-blue-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-sky-100">
       <AppHeader />
       <main className="flex-grow flex flex-col items-center justify-start pt-6 sm:pt-10 pb-8 px-4 w-full">
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg space-y-6">
@@ -82,7 +102,7 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
                   playerId={player.id}
                   playerIndex={index}
                   currentName={player.name}
-                  onNameChange={handleNameChange}
+                  onStateChange={handlePlayerNameStateChange}
                   maxLength={50}
                 />
               ))}
@@ -92,7 +112,12 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
               <Button type="button" onClick={onBack} variant="secondary" className="w-full sm:w-auto">
                 Back
               </Button>
-              <Button type="submit" variant="primary" className="w-full sm:flex-grow py-3 text-lg">
+              <Button 
+                type="submit" 
+                variant="primary" 
+                className="w-full sm:flex-grow py-3 text-lg"
+                disabled={isAnyNameInvalid}
+              >
                 Start Game Session
               </Button>
             </div>

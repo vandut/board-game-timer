@@ -140,8 +140,8 @@ const RoundsInput: React.FC<RoundsInputProps> = ({
           onChange={handleInputChange}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className={`p-3 pr-10 border rounded-lg shadow-sm focus:ring-2 focus:border-indigo-500 outline-none transition-colors w-full bg-white text-slate-900 placeholder-slate-400 ${
-            error ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-indigo-500'
+          className={`p-3 pr-10 border rounded-lg shadow-sm focus:ring-2 focus:border-sky-500 outline-none transition-colors w-full bg-white text-slate-900 placeholder-slate-400 ${
+            error ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-sky-500'
           }`}
           style={{ colorScheme: 'light' }}
           required

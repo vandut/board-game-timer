@@ -1,10 +1,12 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 
 interface PlayerNameInputProps {
   playerId: number;
   playerIndex: number;
   currentName: string;
-  onNameChange: (playerId: number, newName: string) => void;
+  // onNameChange: (playerId: number, newName: string) => void; // Replaced
+  onStateChange: (playerId: number, newName: string, hasError: boolean) => void;
   maxLength: number;
 }
 
@@ -12,7 +14,7 @@ const PlayerNameInput: React.FC<PlayerNameInputProps> = ({
   playerId,
   playerIndex,
   currentName,
-  onNameChange,
+  onStateChange,
   maxLength,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -20,29 +22,45 @@ const PlayerNameInput: React.FC<PlayerNameInputProps> = ({
 
   const errorId = `player-name-error-${playerId}`;
 
+  // Effect to manage showInlineError based on currentName prop and focus state
+  useEffect(() => {
+    const isFocused = document.activeElement === inputRef.current;
+    const isEmpty = currentName.trim() === '';
+
+    if (isEmpty) {
+      // If the prop makes the input empty:
+      // - Show error if blurred.
+      // - Suppress error if focused (e.g., parent reset, or user just cleared it).
+      setShowInlineError(!isFocused);
+    } else {
+      setShowInlineError(false); // Not empty, so no visual error.
+    }
+  }, [currentName]);
+
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
-    onNameChange(playerId, newName);
-    // If user starts typing and an error was shown, clear it
-    if (newName.trim() !== '' && showInlineError) {
-      setShowInlineError(false);
-    }
+    const hasError = newName.trim() === '';
+    onStateChange(playerId, newName, hasError);
+
+    // If typing makes it empty, show error. If typing makes it non-empty, clear error.
+    setShowInlineError(hasError);
   };
 
   const handleClearInput = () => {
-    onNameChange(playerId, '');
-    // Do not set error here, focus and let blur handle it
+    onStateChange(playerId, '', true); // Name is now empty, hasError is true
+    // Visual error is suppressed because input is cleared and will be focused.
+    setShowInlineError(false); 
     if (inputRef.current) {
       inputRef.current.focus();
     }
   };
 
   const handleBlur = () => {
-    if (currentName.trim() === '') {
-      setShowInlineError(true); // Show error if blurred empty
-    } else {
-      setShowInlineError(false); // Clear error if blurred with content
-    }
+    // On blur, if the input is empty, show the visual error.
+    const hasError = currentName.trim() === '';
+    setShowInlineError(hasError);
+    // onStateChange should have already been called by input change or clear.
   };
 
   const inputId = `player-name-${playerId}`;

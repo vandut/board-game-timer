@@ -5,7 +5,7 @@ import TimerDisplay from '../../components/TimerDisplay';
 import AppHeader from '../../components/AppHeader'; 
 import { playNavigateForwardSound } from '../../audioUtils';
 import SessionTimeInput from './SessionTimeInput';
-import RoundsInput from './RoundsInput'; // Changed import
+import RoundsInput from './RoundsInput'; 
 
 interface TimeConfigScreenProps {
   onSaveSettings: (settings: Omit<GameSettings, 'numberOfPlayers'>) => void;
@@ -90,12 +90,12 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
   };
   
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-100 to-indigo-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-sky-100">
       <AppHeader />
       <main className="flex-grow flex flex-col items-center justify-start pt-6 sm:pt-10 pb-8 px-4 w-full">
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg space-y-6">
           <header className="text-center mb-6">
-              <h1 className="text-2xl sm:text-3xl font-bold text-indigo-700">Configure Game Time</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-sky-700">Configure Game Time</h1>
               <p className="text-md text-slate-600 mt-1">
                   For {numberOfPlayersFromProps} player{numberOfPlayersFromProps !== 1 ? 's' : ''}.
               </p>
@@ -103,7 +103,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="p-4 border border-slate-200 rounded-lg space-y-4 bg-slate-50/50">
-              <h2 className="text-lg font-semibold text-indigo-600">
+              <h2 className="text-lg font-semibold text-sky-600">
                 Session Duration & Rounds
               </h2>
               
@@ -116,7 +116,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
                 placeholder="e.g., 01:30 or 2"
               />
               
-              <RoundsInput // Changed component
+              <RoundsInput
                 id="numRounds"
                 initialValue={numRounds}
                 onValueChange={handleNumRoundsChange}
@@ -130,7 +130,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
                             id="carryOverTime"
                             checked={carryOverTime}
                             onChange={(e) => setCarryOverTime(e.target.checked)}
-                            className="h-4 w-4 bg-white text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+                            className="h-4 w-4 bg-white text-sky-600 border-slate-300 rounded focus:ring-sky-500"
                             style={{ colorScheme: 'light' }}
                         />
                         <label htmlFor="carryOverTime" className="text-sm font-medium text-slate-700">
@@ -144,7 +144,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
                             id="payOverdueTime"
                             checked={payOverdueTime}
                             onChange={(e) => setPayOverdueTime(e.target.checked)}
-                            className="h-4 w-4 bg-white text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+                            className="h-4 w-4 bg-white text-sky-600 border-slate-300 rounded focus:ring-sky-500"
                             style={{ colorScheme: 'light' }}
                         />
                         <label htmlFor="payOverdueTime" className="text-sm font-medium text-slate-700">
@@ -156,9 +156,9 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
 
 
               {estimatedTimePerPlayerPerRound > 0 && !sessionTimeError && !numRoundsError && (
-                  <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-center">
-                  <p className="text-sm text-indigo-600">Approx. Time per Player per Round:</p>
-                  <TimerDisplay timeInSeconds={estimatedTimePerPlayerPerRound} className="text-xl font-semibold text-indigo-700" />
+                  <div className="p-3 bg-sky-50 border border-sky-200 rounded-lg text-center">
+                  <p className="text-sm text-sky-600">Approx. Time per Player per Round:</p>
+                  <TimerDisplay timeInSeconds={estimatedTimePerPlayerPerRound} className="text-xl font-semibold text-sky-700" />
                   </div>
               )}
             </div>
@@ -170,7 +170,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
               <Button 
                 type="submit" 
                 variant="primary" 
-                className="w-full sm:flex-grow py-3 text-lg bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+                className="w-full sm:flex-grow py-3 text-lg"
                 disabled={!!sessionTimeError || !!numRoundsError}
               >
                 Next: Set Player Names
