@@ -3,6 +3,7 @@ import { GameSettings } from '../../types';
 import Button from '../../components/Button';
 import TimerDisplay from '../../components/TimerDisplay';
 import AppHeader from '../../components/AppHeader'; 
+import AppFooter from '../../components/AppFooter'; // Import the new footer
 import { playNavigateForwardSound } from '../../audioUtils';
 import SessionTimeInput from './SessionTimeInput';
 import RoundsInput from './RoundsInput'; 
@@ -179,9 +180,7 @@ const TimeConfigScreen: React.FC<TimeConfigScreenProps> = ({ onSaveSettings, onB
           </form>
         </div>
       </main>
-      <footer className="w-full text-center py-4 text-sm text-slate-500">
-        <p>&copy; {new Date().getFullYear()} Board Game Timer App</p>
-      </footer>
+      <AppFooter />
     </div>
   );
 };

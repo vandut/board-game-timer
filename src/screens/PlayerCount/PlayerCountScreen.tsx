@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import Button from '../../components/Button';
 import AppHeader from '../../components/AppHeader'; 
+import AppFooter from '../../components/AppFooter'; // Import the new footer
 import { playNavigateForwardSound } from '../../audioUtils';
 import PlayerCountInput from './PlayerCountInput';
 
@@ -57,9 +58,7 @@ const PlayerCountScreen: React.FC<PlayerCountScreenProps> = ({ onProceedToTimeCo
           </form>
         </div>
       </main>
-      <footer className="w-full text-center py-4 text-sm text-slate-500">
-        <p>&copy; {new Date().getFullYear()} Board Game Timer App</p>
-      </footer>
+      <AppFooter />
     </div>
   );
 };

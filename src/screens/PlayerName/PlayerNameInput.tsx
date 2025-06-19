@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 
 interface PlayerNameInputProps {
@@ -81,8 +80,8 @@ const PlayerNameInput: React.FC<PlayerNameInputProps> = ({
           placeholder="Enter player name"
           className={`p-3 pr-10 border rounded-lg shadow-sm focus:ring-2 outline-none transition-colors w-full bg-white text-slate-900 placeholder-slate-400 ${
             showInlineError 
-              ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
-              : 'border-slate-300 focus:ring-sky-500 focus:border-sky-500'
+              ? 'border-red-500 focus:ring-red-500' 
+              : 'border-slate-300 focus:ring-sky-500'
           }`}
           style={{ colorScheme: 'light' }}
           required

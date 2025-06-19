@@ -1,9 +1,8 @@
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Player, GameSettings } from '../../types';
 import Button from '../../components/Button';
 import AppHeader from '../../components/AppHeader';
+import AppFooter from '../../components/AppFooter'; // Import the new footer
 import { playNavigateForwardSound } from '../../audioUtils';
 import PlayerNameInput from './PlayerNameInput';
 import GameSettingsDisplay from './GameSettingsDisplay';
@@ -77,9 +76,7 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
         <main className="flex-grow flex items-center justify-center p-4">
           Loading player setup...
         </main>
-        <footer className="w-full text-center py-4 text-sm text-slate-500">
-         <p>&copy; {new Date().getFullYear()} Board Game Timer App</p>
-        </footer>
+        <AppFooter />
       </div>
     );
   }
@@ -95,18 +92,16 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
           </header>
           
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="max-h-[50vh] overflow-y-auto pr-2 space-y-4">
-              {editablePlayers.map((player, index) => (
-                <PlayerNameInput
-                  key={player.id}
-                  playerId={player.id}
-                  playerIndex={index}
-                  currentName={player.name}
-                  onStateChange={handlePlayerNameStateChange}
-                  maxLength={50}
-                />
-              ))}
-            </div>
+            {editablePlayers.map((player, index) => (
+              <PlayerNameInput
+                key={player.id}
+                playerId={player.id}
+                playerIndex={index}
+                currentName={player.name}
+                onStateChange={handlePlayerNameStateChange}
+                maxLength={50}
+              />
+            ))}
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button type="button" onClick={onBack} variant="secondary" className="w-full sm:w-auto">
@@ -124,9 +119,7 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
           </form>
         </div>
       </main>
-       <footer className="w-full text-center py-4 text-sm text-slate-500">
-        <p>&copy; {new Date().getFullYear()} Board Game Timer App</p>
-      </footer>
+      <AppFooter />
     </div>
   );
 };
