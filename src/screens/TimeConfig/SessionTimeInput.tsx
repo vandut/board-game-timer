@@ -1,51 +1,64 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-// Helper function to parse and validate HH:MM time string or H input
-const parseTimeValue = (timeValue: string): { majorUnit: number; minorUnit: number; isValid: boolean; error?: string; formatted?: string } => {
+// Helper to parse time string.
+// Ensures hours/minutes are padded for the finalFormatted string.
+const parseTime = (
+  timeValue: string,
+  _forFinalFormat_not_currently_used: boolean = false // Parameter kept for signature consistency but its specific logic path removed
+): { hours: number; minutes: number; isValid: boolean; error?: string; finalFormatted?: string } => {
   const trimmedTimeValue = timeValue.trim();
+
   if (trimmedTimeValue === "") {
-    return { majorUnit: 0, minorUnit: 0, isValid: false, error: "Time cannot be empty." };
+    return { hours: 0, minutes: 0, isValid: false, error: "Time cannot be empty." };
   }
 
-  const timeRegex = /^(\d{1,2}):(\d{1,2})$/; // HH:MM
-  let match = trimmedTimeValue.match(timeRegex);
-  let majorUnit: number; // Hours
-  let minorUnit: number; // Minutes
+  const flexibleTimeRegex = /^(\d{1,2})(?::(\d{0,2}))?$/;
+  let match = trimmedTimeValue.match(flexibleTimeRegex);
+
+  let h: number, m: number;
 
   if (match) {
-    majorUnit = parseInt(match[1], 10);
-    minorUnit = parseInt(match[2], 10);
-  } else if (/^\d{1,2}$/.test(trimmedTimeValue)) { // Single number as Hours (max 2 digits for H)
-    majorUnit = parseInt(trimmedTimeValue, 10);
-    minorUnit = 0;
+    h = parseInt(match[1], 10);
+    const minutesStr = match[2];
+
+    if (minutesStr !== undefined && minutesStr !== '') {
+      // Single digit minutes (e.g., "1:2") are parsed as their value (e.g., 2 minutes).
+      // The final formatting (e.g., "01:02") is handled by padStart below.
+      m = parseInt(minutesStr, 10);
+      if (isNaN(m)) m = 0; // e.g., "1:" while typing -> 1 hour 0 minutes
+    } else { // No colon or no minute digits after colon (e.g., "1" or "1:")
+      m = 0; // e.g., "1" -> 1 hour 0 minutes
+    }
   } else {
     const formatHint = "HH:MM or H (e.g., 01:30 or 2 for hours)";
-    return { majorUnit: 0, minorUnit: 0, isValid: false, error: `Invalid format. Use ${formatHint}.` };
+    return { hours: 0, minutes: 0, isValid: false, error: `Invalid format. Use ${formatHint}.` };
+  }
+  
+  if (isNaN(h)) { 
+      return { hours: 0, minutes: 0, isValid: false, error: "Invalid hour value." };
   }
 
-  if (isNaN(majorUnit) || isNaN(minorUnit)) {
-    return { majorUnit: 0, minorUnit: 0, isValid: false, error: "Invalid number conversion." };
+  // Validate ranges
+  if (h < 0 || h > 99) {
+    return { hours: h, minutes: m, isValid: false, error: 'Hours must be between 0 and 99.' };
+  }
+  if (m < 0 || m > 59) {
+    return { hours: h, minutes: m, isValid: false, error: 'Minutes must be between 0 and 59.' };
   }
 
-  if (majorUnit < 0 || majorUnit > 99) {
-    return { majorUnit, minorUnit, isValid: false, error: 'Hours must be between 0 and 99.' };
+  if (h === 0 && m === 0) {
+    return { hours: h, minutes: m, isValid: false, error: "Smallest time is 1 minute (e.g., 00:01)." };
   }
-  if (minorUnit < 0 || minorUnit > 59) {
-    return { majorUnit, minorUnit, isValid: false, error: 'Minutes must be between 0 and 59.' };
-  }
+  
+  const finalFormattedHours = String(h).padStart(2, '0');
+  const finalFormattedMinutes = String(m).padStart(2, '0');
 
-  if (majorUnit === 0 && minorUnit === 0) {
-    return { majorUnit, minorUnit, isValid: false, error: "Smallest time is 1 minute (e.g., 00:01 or 1 for 1 hour)." };
-  }
-
-  const formattedMajor = String(majorUnit).padStart(2, '0');
-  const formattedMinor = String(minorUnit).padStart(2, '0');
-
-  // For display, if it was single H input, show H, else HH:MM
-  const displayFormatted = (match || trimmedTimeValue.includes(':')) ? `${formattedMajor}:${formattedMinor}` : String(majorUnit);
-
-
-  return { majorUnit, minorUnit, isValid: true, formatted: displayFormatted };
+  return {
+    hours: h,
+    minutes: m,
+    isValid: true,
+    finalFormatted: `${finalFormattedHours}:${finalFormattedMinutes}`,
+  };
 };
 
 
@@ -66,115 +79,157 @@ const SessionTimeInput: React.FC<SessionTimeInputProps> = ({
   onTimeChange,
   placeholder,
 }) => {
-  const formatInitialDisplayValue = (h: number, m: number) => {
-    // If initial is e.g. 2 hours 0 minutes, display as "2", not "02:00"
-    // unless it was explicitly set with minutes initially.
-    // For simplicity now, always format to HH:MM if minutes are involved or hours > 0
-    // This could be refined if strict H vs HH:MM display based on input type is desired
-    if (h === 0 && m === 0) return "00:01"; // Default to a valid small time if initial is 0
+  const formatPropValuesToHHMM = useCallback((h: number, m: number): string => {
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-  };
+  },[]);
 
-  const [displayValue, setDisplayValue] = useState<string>(formatInitialDisplayValue(initialHours, initialMinutes));
+  const [displayValue, setDisplayValue] = useState<string>(() => formatPropValuesToHHMM(initialHours, initialMinutes));
   const [error, setError] = useState<string | null>(null);
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false);
+  
   const inputRef = useRef<HTMLInputElement>(null);
-  // Store last valid reported values to prevent callback with stale data if input is temporarily invalid
   const lastReportedHoursRef = useRef<number>(initialHours);
   const lastReportedMinutesRef = useRef<number>(initialMinutes);
 
-  const validateAndCallback = useCallback((currentDisplayValue: string, isFocused: boolean) => {
-    const validationResult = parseTimeValue(currentDisplayValue);
-    let visualErrorToSet: string | null = null;
-
-    if (validationResult.isValid) {
-      onTimeChange(validationResult.majorUnit, validationResult.minorUnit, null);
-      lastReportedHoursRef.current = validationResult.majorUnit;
-      lastReportedMinutesRef.current = validationResult.minorUnit;
-      visualErrorToSet = null;
-    } else {
-      onTimeChange(lastReportedHoursRef.current, lastReportedMinutesRef.current, validationResult.error || "Invalid time.");
-      visualErrorToSet = validationResult.error || "Invalid time.";
-      if (currentDisplayValue === '' && isFocused) {
-        visualErrorToSet = null; // Suppress visual error if empty and focused
+  useEffect(() => {
+    // Sync internal refs for "last known good values from parent" or "context for parent error reporting"
+    lastReportedHoursRef.current = initialHours;
+    lastReportedMinutesRef.current = initialMinutes;
+  
+    if (isInputFocused) {
+      // If focused, user input takes precedence. `handleInputChange`, `handleClearInput`, and `handleBlur` manage displayValue and error.
+      // This effect should not overwrite `displayValue` or `error` while user is typing or the input is focused.
+      return;
+    }
+  
+    // --- Input is NOT focused ---
+  
+    const propsSuggestNonEmptyTime = initialHours !== 0 || initialMinutes !== 0;
+    if (displayValue === "" && propsSuggestNonEmptyTime) {
+      const emptyCheckResult = parseTime("", true); 
+      if (error !== emptyCheckResult.error) {
+        setError(emptyCheckResult.error); 
+      }
+      return; 
+    }
+  
+    const newDisplayValueFromProps = formatPropValuesToHHMM(initialHours, initialMinutes);
+    const currentPropsValidation = parseTime(newDisplayValueFromProps, true);
+    const needsUiUpdate = 
+      newDisplayValueFromProps !== displayValue || 
+      (currentPropsValidation.isValid && error !== null) ||
+      (!currentPropsValidation.isValid && error !== currentPropsValidation.error);
+  
+    if (needsUiUpdate) {
+      setDisplayValue(newDisplayValueFromProps); 
+  
+      if (currentPropsValidation.isValid) {
+        setError(null);
+        if (currentPropsValidation.hours !== initialHours || currentPropsValidation.minutes !== initialMinutes || error !== null) {
+          onTimeChange(currentPropsValidation.hours, currentPropsValidation.minutes, null);
+          lastReportedHoursRef.current = currentPropsValidation.hours; 
+          lastReportedMinutesRef.current = currentPropsValidation.minutes;
+        }
+      } else {
+        setError(currentPropsValidation.error);
+        if (error !== currentPropsValidation.error) { 
+            onTimeChange(initialHours, initialMinutes, currentPropsValidation.error);
+        }
       }
     }
-    return visualErrorToSet;
-  }, [onTimeChange]);
-
-  useEffect(() => {
-    // Sync with props if they change
-    const newInitialDisplay = formatInitialDisplayValue(initialHours, initialMinutes);
-    const isFocused = document.activeElement === inputRef.current;
-    
-    // Avoid resetting user's active input if prop changes but value is same
-    // Or if user just cleared the input and it's focused
-    if (newInitialDisplay === displayValue && !error && !isFocused && parseTimeValue(displayValue).isValid) { // if same, valid, and not focused, no need to re-validate
-        return;
-    }
-    if (isFocused && displayValue === '') { // User cleared it
-        const validationError = parseTimeValue('').error;
-        onTimeChange(lastReportedHoursRef.current, lastReportedMinutesRef.current, validationError || "Time cannot be empty.");
-        setError(null); // No visual error if focused and empty
-        return;
-    }
-
-    setDisplayValue(newInitialDisplay);
-    const validationError = validateAndCallback(newInitialDisplay, isFocused);
-    setError(validationError);
-    
-    // Update refs for last reported values from props
-    const parsedInitial = parseTimeValue(newInitialDisplay);
-    if(parsedInitial.isValid) {
-        lastReportedHoursRef.current = parsedInitial.majorUnit;
-        lastReportedMinutesRef.current = parsedInitial.minorUnit;
-    }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialHours, initialMinutes]); // validateAndCallback dependency not needed here as it's stable
+  }, [initialHours, initialMinutes, isInputFocused, onTimeChange, formatPropValuesToHHMM, error, displayValue]);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    // Allow digits, colon. Max 5 chars (HH:MM).
+    // Filter characters: allow digits, at most one colon.
     value = value.replace(/[^0-9:]/g, '');
     const colonCount = (value.match(/:/g) || []).length;
     if (colonCount > 1) {
       const firstColonIndex = value.indexOf(':');
       value = value.substring(0, firstColonIndex + 1) + value.substring(firstColonIndex + 1).replace(/:/g, '');
     }
-    if (value.length > 5) {
-      value = value.substring(0, 5);
-    }
+    // Max length for HH:MM is 5. Max 2 for H.
+    const parts = value.split(':');
+    if (parts[0].length > 2) parts[0] = parts[0].substring(0,2);
+    if (parts.length > 1 && parts[1] && parts[1].length > 2) parts[1] = parts[1].substring(0,2);
+    value = parts.join(':');
+    if (value.length > 5) value = value.substring(0,5);
+
+
+    setDisplayValue(value); 
     
-    setDisplayValue(value);
-    const visualError = validateAndCallback(value, true); // true as input is focused
-    setError(visualError);
+    const parsedResult = parseTime(value, false); 
+
+    if (parsedResult.isValid) {
+      onTimeChange(parsedResult.hours, parsedResult.minutes, null);
+      lastReportedHoursRef.current = parsedResult.hours;
+      lastReportedMinutesRef.current = parsedResult.minutes;
+      setError(null);
+    } else {
+      onTimeChange(lastReportedHoursRef.current, lastReportedMinutesRef.current, parsedResult.error || "Invalid time.");
+      // Show visual error, unless input is empty AND focused (user is actively clearing it)
+      if (value.trim() === '' && isInputFocused) {
+        setError(null); // Visual error hidden while user is clearing a focused input
+      } else {
+        setError(parsedResult.error || "Invalid time.");
+      }
+    }
+  };
+
+  const handleFocus = () => {
+    setIsInputFocused(true);
+    // When input is focused, the parent should be updated with the current validity.
+    // The visual error state (`error`) is primarily managed by:
+    // - `handleInputChange` or `handleClearInput` (clears visual error if focused and made empty)
+    // - `handleBlur` (sets visual error if invalid, e.g., empty)
+    // - `useEffect` (bails out if focused, preserving the error state set by blur/active edits)
+    // This `handleFocus` method itself does not change `setError`.
+    // It ensures `onTimeChange` is called so the parent knows the input's state upon focus.
+
+    const parsedResult = parseTime(displayValue, false);
+    if (parsedResult.isValid) {
+      // If content is valid, ensure parent knows (e.g. if state was out of sync, or became valid)
+      onTimeChange(parsedResult.hours, parsedResult.minutes, null);
+    } else {
+      // If content is invalid (empty or malformed), ensure parent knows.
+      // Use lastReportedH/M for context if parsing fails to yield new H/M.
+      onTimeChange(lastReportedHoursRef.current, lastReportedMinutesRef.current, parsedResult.error);
+    }
   };
 
   const handleBlur = () => {
-    const validationResult = parseTimeValue(displayValue);
-    if (validationResult.isValid && validationResult.formatted) {
-      // Normalize format on blur if valid
-      // For instance, if user types "1", on blur it might become "01:00" or stay "1"
-      // Let's use the formatted value from parser which handles H vs HH:MM
-      setDisplayValue(validationResult.formatted); 
+    setIsInputFocused(false);
+    const currentVal = displayValue.trim();
+    const parsedResult = parseTime(currentVal, true); // Parse for final formatting
+
+    if (parsedResult.isValid && parsedResult.finalFormatted) {
+      setDisplayValue(parsedResult.finalFormatted); 
+      onTimeChange(parsedResult.hours, parsedResult.minutes, null);
+      lastReportedHoursRef.current = parsedResult.hours;
+      lastReportedMinutesRef.current = parsedResult.minutes;
       setError(null);
-      onTimeChange(validationResult.majorUnit, validationResult.minorUnit, null);
-      lastReportedHoursRef.current = validationResult.majorUnit;
-      lastReportedMinutesRef.current = validationResult.minorUnit;
     } else {
-      setError(validationResult.error || "Invalid time.");
-      // onTimeChange already called by validateAndCallback via handleInputChange or useEffect
+      setError(parsedResult.error || "Invalid time.");
+      onTimeChange(
+        lastReportedHoursRef.current,
+        lastReportedMinutesRef.current,
+        parsedResult.error || "Invalid time."
+      );
     }
   };
 
   const handleClearInput = () => {
     setDisplayValue('');
-    const validationError = parseTimeValue('').error; // Get error for empty
-    onTimeChange(lastReportedHoursRef.current, lastReportedMinutesRef.current, validationError || "Time cannot be empty.");
-    setError(null); // No visual error as it will be focused
+    const emptyError = parseTime('', false).error;
+    onTimeChange(
+        lastReportedHoursRef.current, 
+        lastReportedMinutesRef.current, 
+        emptyError || "Time cannot be empty."
+    );
+    setError(null); // Visually hide error as input will be focused.
     if (inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus(); 
     }
   };
 
@@ -188,11 +243,12 @@ const SessionTimeInput: React.FC<SessionTimeInputProps> = ({
       <div className="relative w-full">
         <input
           ref={inputRef}
-          type="text" // Using text to allow HH:MM format
-          inputMode="text" // No specific numeric mode is perfect for HH:MM
+          type="text" 
+          inputMode="text" 
           id={id}
           value={displayValue}
           onChange={handleInputChange}
+          onFocus={handleFocus}
           onBlur={handleBlur}
           placeholder={placeholder || "HH:MM or H"}
           className={`p-3 pr-10 border rounded-lg shadow-sm focus:ring-2 focus:border-sky-500 outline-none transition-colors w-full bg-white text-slate-900 placeholder-slate-400 ${
@@ -202,7 +258,7 @@ const SessionTimeInput: React.FC<SessionTimeInputProps> = ({
           required
           aria-describedby={error ? errorId : undefined}
           aria-invalid={!!error}
-          maxLength={5} // For HH:MM
+          maxLength={5} 
         />
         {displayValue && (
           <button
