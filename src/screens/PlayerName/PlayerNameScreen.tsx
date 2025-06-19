@@ -19,33 +19,15 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
   onConfirm,
   onBack,
 }) => {
-  const [editablePlayers, setEditablePlayers] = useState<Player[]>([]);
+  // Initialize editablePlayers directly with the initialPlayers prop.
+  // This assumes initialPlayers already has correctly calculated time properties from App.tsx.
+  const [editablePlayers, setEditablePlayers] = useState<Player[]>(initialPlayers);
 
+  // If initialPlayers prop itself changes (e.g. user goes back and settings change, or initial load),
+  // ensure editablePlayers is updated to reflect the new prop.
   useEffect(() => {
-    const totalSessionSeconds = (gameSettings.totalSessionTimeHours * 3600) + (gameSettings.totalSessionTimeMinutes * 60);
-    let playerTotalTimeAllocated = 0;
-    if (gameSettings.numberOfPlayers > 0) {
-      playerTotalTimeAllocated = Math.floor(totalSessionSeconds / gameSettings.numberOfPlayers);
-    } else {
-      playerTotalTimeAllocated = totalSessionSeconds;
-    }
-    let playerRoundTimeAllocated = 0;
-    if (gameSettings.numberOfPlayers > 0 && gameSettings.numberOfRounds > 0) {
-      playerRoundTimeAllocated = Math.floor(totalSessionSeconds / gameSettings.numberOfPlayers / gameSettings.numberOfRounds);
-    } else if (gameSettings.numberOfPlayers > 0) {
-      playerRoundTimeAllocated = playerTotalTimeAllocated;
-    } else {
-        playerRoundTimeAllocated = totalSessionSeconds / (gameSettings.numberOfRounds > 0 ? gameSettings.numberOfRounds : 1);
-    }
-
-    setEditablePlayers(initialPlayers.map(p => ({ 
-        ...p,
-        timeAllocated: playerTotalTimeAllocated,
-        timeRemaining: playerTotalTimeAllocated,
-        roundTimeAllocated: playerRoundTimeAllocated,
-        roundTimeRemaining: playerRoundTimeAllocated,
-    })));
-  }, [initialPlayers, gameSettings]);
+    setEditablePlayers(initialPlayers);
+  }, [initialPlayers]);
 
   const handleNameChange = (playerId: number, newName: string) => {
     setEditablePlayers(prevPlayers =>
@@ -60,9 +42,14 @@ const PlayerNameScreen: React.FC<PlayerNameScreenProps> = ({
         return;
     }
     await playNavigateForwardSound();
+    // onConfirm now passes editablePlayers which has updated names,
+    // and the time properties are those that were originally passed in via initialPlayers.
     onConfirm(editablePlayers);
   };
 
+  // This loading condition might briefly be true if initialPlayers is somehow not populated
+  // when the component first renders, before the useEffect [initialPlayers] kicks in.
+  // However, App.tsx should ensure initialPlayers is populated before navigating here.
   if (!editablePlayers.length && gameSettings.numberOfPlayers > 0) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-100 to-blue-100">
